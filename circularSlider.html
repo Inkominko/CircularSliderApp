@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+	
+	body {
+		background-color: #ecf0f1;	
+	}
+    
+    #container{
+        height: 500px;
+        width: 650px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+    
+    #containerCircle {
+        height: 500px;
+        width: 500px;
+        position: absolute;
+        right: 0;
+    }
+    
+    #containerValue {
+        height: 500px;
+        width: 150px;
+        position: absolute;
+        left: 0;
+    }
+    
+    canvas {
+        position: absolute;
+        width: 520px;
+        height: 520px;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        opacity: 0.7;
+        z-index: 1;
+    }
+    
+    .circle {
+        position: absolute;
+        width: 20px;
+        height: 4px;
+        background-color: #bdc3c7;
+    }
+    
+    #knob1, #knob2, #knob3, #knob4, #knob5 {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        height: 1px;
+        -webkit-transform-origin: center left;
+        -moz-transform-origin: center left;
+        -ms-transform-origin: center left;
+        -o-transform-origin: center left;
+        transform-origin: center left;
+        z-index: 2;
+    }
+    #knob1{
+        width: 12%;
+    }
+    #knob2{
+        width: 21.75%;
+    }
+    #knob3{
+        width: 31.5%;
+    }
+    #knob4{
+        width: 41%;
+    }
+    #knob5{
+        width: 50.5%;
+    }
+    
+    #knob-circle1, #knob-circle2, #knob-circle3, #knob-circle4, #knob-circle5  {
+        width: 26px;
+        height: 26px;
+        border: 2px solid #bdc3c7;
+        border-radius: 50%;
+        margin: -18px 0 0 auto;
+        background: radial-gradient(circle, white, white, #bdc3c7);
+        cursor: move;
+    }
+    
+	#knob-value1, #knob-value2, #knob-value3, #knob-value4, #knob-value5 {
+		position: absolute;
+		font-size: 30px;
+		font-family: sans-serif;
+		color: #34495e;
+	}
+    #knob-value1{
+        top: 10%;
+    }
+    #knob-value2{
+        top: 30%;
+    }
+    #knob-value3{
+        top: 50%;
+    }
+    #knob-value4{
+        top: 70%;
+    }
+    #knob-value5{
+        top: 90%;
+    }
+    
+    #expenses1, #expenses2, #expenses3, #expenses4, #expenses5 {
+		position: absolute;
+		font-size: 15px;
+		font-family: sans-serif;
+		color: #34495e;
+		left: 15%;
+	}
+    #expenses1{
+		top: 5%;
+	}
+    #expenses2{
+		top: 25%;
+	}
+    #expenses3{
+		top: 45%;
+	}
+    #expenses4{
+		top: 65%;
+	}
+    #expenses5{
+		top: 85%;
+	}
+    
+    #legend-color1, #legend-color2, #legend-color3, #legend-color4, #legend-color5 {
+        position: absolute;
+        height: 20px;
+        width: 20px;
+        border-radius: 25%;
+        opacity: 0.7;
+    }
+    #legend-color1{
+        top: 5%;
+        background-color: #e74c3c;
+    }
+    #legend-color2{
+        top: 25%;
+        background-color: #e67e22;
+    }
+    #legend-color3{
+        top: 45%;
+        background-color: #2ecc71;
+    }
+    #legend-color4{
+        top: 65%;
+        background-color: #3498db;
+    }
+    #legend-color5{
+        top: 85%;
+        background-color: #9b59b6;
+    }
+    
+</style>
+</head>
+
+<body>
+    <div id="container">
+        <div id="containerValue">
+
+            <div id="legend-color1"></div>
+            <div id="expenses1">Transportation</div>
+            <div id="legend-color2"></div>
+            <div id="expenses2">Food</div>
+            <div id="legend-color3"></div>
+            <div id="expenses3">Insurance</div>
+            <div id="legend-color4"></div>
+            <div id="expenses4">Entertainment</div>
+            <div id="legend-color5"></div>
+            <div id="expenses5">Health care</div>
+
+            <div id="knob-value1">$0</div>
+            <div id="knob-value2">$0</div>
+            <div id="knob-value3">$0</div>
+            <div id="knob-value4">$0</div>
+            <div id="knob-value5">$0</div>
+        </div>
+
+        <div id="containerCircle">
+
+            <canvas width=520 height=520 id="circularFiller1"></canvas>
+            <canvas width=520 height=520 id="circularFiller2"></canvas>
+            <canvas width=520 height=520 id="circularFiller3"></canvas>
+            <canvas width=520 height=520 id="circularFiller4"></canvas>
+            <canvas width=520 height=520 id="circularFiller5"></canvas>
+
+            <div id="knob1">
+                <div id="knob-circle1"></div>
+            </div>
+            <div id="knob2">
+                <div id="knob-circle2"></div>
+            </div>
+            <div id="knob3">
+                <div id="knob-circle3"></div>
+            </div>
+            <div id="knob4">
+                <div id="knob-circle4"></div>
+            </div>
+            <div id="knob5">
+                <div id="knob-circle5"></div>
+            </div>
+
+        </div>
+    </div>
+  
+<script>
+    
+    var numCircles = 5;
+    var currency = '$';
+    
+	var maxValue1 = 1000;
+	var maxValue2 = 900;
+	var maxValue3 = 800;
+	var maxValue4 = 700;
+	var maxValue5 = 650;
+    
+    var fillerCircleRadius = 48;    //filler (canvas) and circle radius
+    var fillerWidth = 24;           //colored filler width in canvas on drag
+    var numLinesCircle = 40;        //number of lines (sticks) in smallest circle
+    
+	// CIRCULAR LINES POSITION
+    var container = document.getElementById('containerCircle');
+	var containerHeight = parseInt(window.getComputedStyle(container).height.slice(0, -2));
+	
+    var circlesNumber = function() {
+        for (var j = 1; j <= numCircles; j++){
+			
+            var lines = j * numLinesCircle;
+            var radius = j * fillerCircleRadius;
+            var circularPosition = function() {
+                        var circleSticks = [];
+                        for (var i = 0; i <= lines; i++) {
+                            var circle = document.createElement('div');
+                            circle.className = 'circle ' + i;
+                            circleSticks.push(circle);
+                            circleSticks[i].x = Math.round(radius * (Math.cos(Math.PI * 2 * i/lines))) + 'px';
+                            circleSticks[i].y = Math.round(radius * (Math.sin(Math.PI * 2 * i/lines))) + 'px';
+                            circleSticks[i].style.position = 'absolute';
+                            circleSticks[i].style.top = ((containerHeight / 2.015) - parseInt(circleSticks[i].y.slice(0, -2))) + 'px';
+                            circleSticks[i].style.left = ((containerHeight / 2.1) + parseInt(circleSticks[i].x.slice(0, -2))) + 'px';
+                            circleSticks[i].style.transform = 'rotate(' + (360-(i*(360/lines))) + 'deg)';
+                            container.appendChild(circleSticks[i]);
+                        }
+            };
+            circularPosition();
+        }
+    };
+    circlesNumber();
+
+    // KNOB & FILLER 
+    var knob1 = document.getElementById('knob1');
+    var knob2 = document.getElementById('knob2');
+    var knob3 = document.getElementById('knob3');
+    var knob4 = document.getElementById('knob4');
+    var knob5 = document.getElementById('knob5');
+
+    var knobCircle1 = knob1.firstElementChild;
+    var knobCircle2 = knob2.firstElementChild;
+    var knobCircle3 = knob3.firstElementChild;
+    var knobCircle4 = knob4.firstElementChild;
+    var knobCircle5 = knob5.firstElementChild;
+
+    var knobValue1 = document.getElementById('knob-value1');
+    var knobValue2 = document.getElementById('knob-value2');
+    var knobValue3 = document.getElementById('knob-value3');
+    var knobValue4 = document.getElementById('knob-value4');
+    var knobValue5 = document.getElementById('knob-value5');
+
+    var strokeStyleColor = ['#e74c3c', '#e67e22', '#2ecc71', '#3498db', '#9b59b6'];
+
+    var rect = container.getBoundingClientRect();
+
+    center = {
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2
+    }
+
+    var rotate = function(x, y){
+        var deltaX = x - center.x;
+        var deltaY = y - center.y;
+        var angle = Math.atan2(deltaY, deltaX) * 180 /Math.PI;				
+        return angle
+    }
+
+    var touchmove1 = function(){
+        
+        var degValue = rotate(event.pageX, event.pageY);
+
+        if (degValue < 0){
+            degValue = 360 + degValue;
+        }
+
+        knob1.style.transform = 'rotate(' + degValue + 'deg)'
+
+        // PRINT VALUE		
+        knobValue1.innerHTML = currency + Math.round(degValue/360*maxValue1);
+
+        //FILLER
+        var ctx = document.getElementById('circularFiller1').getContext('2d');
+        var cw = ctx.canvas.width;
+        var ch = ctx.canvas.height;
+
+        ctx.clearRect(0, 0, cw, ch);
+        ctx.lineWidth = fillerWidth;
+        ctx.strokeStyle = strokeStyleColor[0];
+        ctx.beginPath();
+        ctx.arc(cw/2, ch/2, 1*fillerCircleRadius, 0, (degValue/360*2)*Math.PI);
+        ctx.stroke();
+    }
+    
+    var touchmove2 = function(){
+
+        var degValue = rotate(event.pageX, event.pageY);
+
+        if (degValue < 0){
+            degValue = 360 + degValue;
+        }
+        
+        knob2.style.transform = 'rotate(' + degValue + 'deg)'
+
+        // PRINT VALUE		
+        knobValue2.innerHTML = currency + Math.round(degValue/360*maxValue2);
+
+        //FILLER
+        var ctx2 = document.getElementById('circularFiller2').getContext('2d');
+        var cw = ctx2.canvas.width;
+        var ch = ctx2.canvas.height;
+
+        ctx2.clearRect(0, 0, cw, ch);
+        ctx2.lineWidth = fillerWidth;
+        ctx2.strokeStyle = strokeStyleColor[1];
+        ctx2.beginPath();
+        ctx2.arc(cw/2, ch/2, 2*fillerCircleRadius, 0, (degValue/360*2)*Math.PI);
+        ctx2.stroke();
+
+    }
+    
+    var touchmove3 = function(){
+
+        var degValue = rotate(event.pageX, event.pageY);
+
+        if (degValue < 0){
+            degValue = 360 + degValue;
+        }
+        
+        knob3.style.transform = 'rotate(' + degValue + 'deg)'
+
+        // PRINT VALUE		
+        knobValue3.innerHTML = currency + Math.round(degValue/360*maxValue3);
+
+        //FILLER
+        var ctx3 = document.getElementById('circularFiller3').getContext('2d');
+        var cw = ctx3.canvas.width;
+        var ch = ctx3.canvas.height;
+
+        ctx3.clearRect(0, 0, cw, ch);
+        ctx3.lineWidth = fillerWidth;
+        ctx3.strokeStyle = strokeStyleColor[2];
+        ctx3.beginPath();
+        ctx3.arc(cw/2, ch/2, 3*fillerCircleRadius, 0, (degValue/360*2)*Math.PI);
+        ctx3.stroke();
+    }
+    
+    var touchmove4 = function(){
+        
+        var degValue = rotate(event.pageX, event.pageY);
+
+        if (degValue < 0){
+            degValue = 360 + degValue;
+        }
+        
+        knob4.style.transform = 'rotate(' + degValue + 'deg)'
+
+        // PRINT VALUE		
+        knobValue4.innerHTML = currency + Math.round(degValue/360*maxValue4);
+
+        //FILLER
+        var ctx4 = document.getElementById('circularFiller4').getContext('2d');
+        var cw = ctx4.canvas.width;
+        var ch = ctx4.canvas.height;
+
+        ctx4.clearRect(0, 0, cw, ch);
+        ctx4.lineWidth = fillerWidth;
+        ctx4.strokeStyle = strokeStyleColor[3];
+        ctx4.beginPath();
+        ctx4.arc(cw/2, ch/2, 4*fillerCircleRadius, 0, (degValue/360*2)*Math.PI);
+        ctx4.stroke();
+    }
+    
+    var touchmove5 = function(){
+        
+        var degValue = rotate(event.pageX, event.pageY);
+
+        if (degValue < 0){
+            degValue = 360 + degValue;
+        }
+        
+        knob5.style.transform = 'rotate(' + degValue + 'deg)'
+
+        // PRINT VALUE		
+        knobValue5.innerHTML = currency + Math.round(degValue/360*maxValue5);
+
+        //FILLER
+        var ctx5 = document.getElementById('circularFiller5').getContext('2d');
+        var cw = ctx5.canvas.width;
+        var ch = ctx5.canvas.height;
+
+        ctx5.clearRect(0, 0, cw, ch);
+        ctx5.lineWidth = fillerWidth;
+        ctx5.strokeStyle = strokeStyleColor[4];
+        ctx5.beginPath();
+        ctx5.arc(cw/2, ch/2, 5*fillerCircleRadius, 0, (degValue/360*2)*Math.PI);
+        ctx5.stroke();
+    }
+    
+    var touchdown1 = function(){
+        document.addEventListener('mousemove', touchmove1)
+        document.addEventListener('mouseup', touchup1)
+            
+    }
+
+    var touchup1 = function(){
+        document.removeEventListener('mouseup', touchup1)
+        document.removeEventListener('mousemove', touchmove1)
+        document.removeEventListener('click', touchmove1)
+    }
+    
+    var touchdown2 = function(){
+        document.addEventListener('mousemove', touchmove2)
+        document.addEventListener('mouseup', touchup2)
+    }
+
+    var touchup2 = function(){
+        document.removeEventListener('mouseup', touchup2)
+        document.removeEventListener('mousemove', touchmove2)
+    }
+    
+    var touchdown3 = function(){
+        document.addEventListener('mousemove', touchmove3)
+        document.addEventListener('mouseup', touchup3)
+    }
+
+    var touchup3 = function(){
+        document.removeEventListener('mouseup', touchup3)
+        document.removeEventListener('mousemove', touchmove3)
+    }
+    
+    var touchdown4 = function(){
+        document.addEventListener('mousemove', touchmove4)
+        document.addEventListener('mouseup', touchup4)
+    }
+
+    var touchup4 = function(){
+        document.removeEventListener('mouseup', touchup4)
+        document.removeEventListener('mousemove', touchmove4)
+    }
+    
+    var touchdown5 = function(){
+        document.addEventListener('mousemove', touchmove5)
+        document.addEventListener('mouseup', touchup5)
+    }
+    
+    var touchup5 = function(){
+        document.removeEventListener('mouseup', touchup5)
+        document.removeEventListener('mousemove', touchmove5)
+    }
+
+    knobCircle1.addEventListener('mousedown', touchdown1);
+    knobCircle2.addEventListener('mousedown', touchdown2);
+    knobCircle3.addEventListener('mousedown', touchdown3);
+    knobCircle4.addEventListener('mousedown', touchdown4);
+    knobCircle5.addEventListener('mousedown', touchdown5);
+
+</script>
+</body>
+</html>
